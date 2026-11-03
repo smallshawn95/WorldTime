@@ -18,6 +18,10 @@ const fixtures = [
   ['2026-01-01T00:00:00Z', 'Asia/Kolkata', '05:30', '+05:30'],
   ['2026-01-01T00:00:00Z', 'Asia/Kathmandu', '05:45', '+05:45'],
   ['2026-01-01T00:00:00Z', 'Australia/Adelaide', '10:30', '+10:30'],
+  ['2026-01-15T12:00:00Z', 'Australia/Melbourne', '23:00', '+11:00'],
+  ['2026-07-15T12:00:00Z', 'Australia/Melbourne', '22:00', '+10:00'],
+  ['2026-01-15T12:00:00Z', 'America/St_Johns', '08:30', '-03:30'],
+  ['2026-07-15T12:00:00Z', 'America/St_Johns', '09:30', '-02:30'],
 ];
 for (const [stamp, timeZone, clock, offset] of fixtures) {
   const date = new Date(stamp);
@@ -37,4 +41,4 @@ assert.equal(localDate('2026-12-31T20:30:00Z', 'Asia/Taipei'), '2027-01-01');
 assert.equal(localDate('2026-12-31T20:30:00Z', 'America/New_York'), '2026-12-31');
 assert.equal(localDate('2026-01-01T11:30:00Z', 'Pacific/Kiritimati'), '2026-01-02');
 assert.equal(localDate('2026-01-01T11:30:00Z', 'Etc/GMT+12'), '2025-12-31');
-console.log('20 independent time-zone reference fixtures passed. Swift/XCTest not executed.');
+console.log('24 independent time-zone reference fixtures passed. Swift/XCTest not executed.');

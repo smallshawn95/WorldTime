@@ -15,6 +15,7 @@ final class ClockTests: XCTestCase {
     }
 
     func testCatalogHasValidUniqueIdentifiers() {
+        XCTAssertGreaterThanOrEqual(CityCatalog.all.count, 150)
         XCTAssertEqual(Set(CityCatalog.all.map(\.id)).count, CityCatalog.all.count)
         for city in CityCatalog.all {
             XCTAssertNotNil(TimeZone(identifier: city.timeZoneIdentifier), city.name)
@@ -137,9 +138,34 @@ final class ClockTests: XCTestCase {
     func testSearchSupportsChineseEnglishAndCountry() {
         XCTAssertTrue(taipei.matches("臺北"))
         XCTAssertTrue(taipei.matches("台北"))
+        XCTAssertTrue(CityCatalog.city(id: "taichung")!.matches("台中"))
         XCTAssertTrue(taipei.matches(" TAIPEI "))
         XCTAssertTrue(newYork.matches("美國"))
         XCTAssertTrue(london.matches("Europe/London"))
+        XCTAssertTrue(CityCatalog.city(id: "montreal")!.matches("Montreal"))
+        XCTAssertTrue(CityCatalog.city(id: "sao-paulo")!.matches("sao paulo"))
         XCTAssertFalse(london.matches("巴黎"))
+    }
+
+    func testCatalogRegionsIncludeAllContinentsAndIndianOcean() {
+        let cases: [(String, CityRegion)] = [
+            ("taipei", .asia), ("male", .asia), ("reykjavik", .europe),
+            ("mexico-city", .americas), ("melbourne", .oceania),
+            ("nairobi", .africa), ("port-louis", .africa)
+        ]
+        for (id, region) in cases {
+            XCTAssertEqual(CityCatalog.city(id: id)?.region, region, id)
+        }
+    }
+
+    func testNewSouthernAndHalfHourTimeZonesFollowSeasonalRules() {
+        let melbourne = CityCatalog.city(id: "melbourne")!
+        let stJohns = CityCatalog.city(id: "st-johns")!
+        let january = instant("2026-01-15T12:00:00Z")
+        let july = instant("2026-07-15T12:00:00Z")
+        XCTAssertEqual(ClockFormatting.utcOffset(january, in: melbourne), "UTC+11:00")
+        XCTAssertEqual(ClockFormatting.utcOffset(july, in: melbourne), "UTC+10:00")
+        XCTAssertEqual(ClockFormatting.utcOffset(january, in: stJohns), "UTC−03:30")
+        XCTAssertEqual(ClockFormatting.utcOffset(july, in: stJohns), "UTC−02:30")
     }
 }

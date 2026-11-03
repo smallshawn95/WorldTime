@@ -101,12 +101,12 @@ def validate():
 
     city_source = (ROOT / "WorldTime/Models/City.swift").read_text(encoding="utf-8")
     ids = re.findall(r'City\(id: "([^"]+)"', city_source)
-    check(len(ids) == 27 and len(ids) == len(set(ids)), "27 catalog city IDs are unique")
+    check(len(ids) >= 150 and len(ids) == len(set(ids)), "At least 150 catalog city IDs are unique")
     test_count = sum(len(re.findall(r"func test\w+\(", path.read_text(encoding="utf-8"))) for path in (ROOT / "WorldTimeTests").glob("*.swift"))
-    check(test_count == 26, "26 XCTest methods included (not executed here)")
+    check(test_count >= 28, "At least 28 XCTest methods included (not executed here)")
     check("swift-tools-version: 5.9" in (ROOT / "Package.swift").read_text(encoding="utf-8"), "Swift package manifest included")
     print(json.dumps({"status": "STATIC_CHECKS_PASSED", "checks": len(checks), "swift_files_parsed": len(swift_files),
-                      "xcode_objects": len(objects), "xctest_methods_present": test_count,
+                      "xcode_objects": len(objects), "cities": len(ids), "xctest_methods_present": test_count,
                       "compiled": False, "xctest_executed": False}, indent=2))
     return checks
 
