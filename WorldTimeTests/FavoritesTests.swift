@@ -29,6 +29,14 @@ final class FavoritesTests: XCTestCase {
         XCTAssertEqual(restored.selectedID, "taipei")
     }
 
+    func testLegacyFavoriteAndSelectionArePreserved() {
+        let data = Data(#"{"cityIDs":["taichung","taipei","detroit"],"selectedID":"taichung"}"#.utf8)
+        let restored = FavoritesState.restored(from: data)
+        XCTAssertEqual(restored.cityIDs, ["taichung", "taipei", "detroit"])
+        XCTAssertEqual(restored.selectedID, "taichung")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: restored.cityIDs[0]), "taipei")
+    }
+
     func testDuplicateAddIsIgnored() {
         var state = FavoritesState.initial
         state.add(CityCatalog.defaults[0])

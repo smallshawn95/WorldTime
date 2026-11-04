@@ -21,3 +21,11 @@ Use case: stylized-concept. Create a premium painterly editorial city landscape 
 ## New York — final prompt
 
 Use case: stylized-concept. Create a premium painterly editorial city landscape cutout asset for a calm iPhone world clock app, portrait 1024x1536. Subject: NEW YORK CITY iconic lower Manhattan skyline from across the East River, One World Trade Center recognizable, layered elegant skyscrapers, Brooklyn Bridge gracefully crossing the lower foreground and river water reflecting the city. Refined cinematic hand-painted illustration, subtle paper grain and atmospheric depth, elegant travel magazine art. Composition: skyline and river occupy ONLY bottom 55 percent, tallest pinnacle about 43% of full image height; entire upper 40% genuinely transparent alpha, NOT white, black or checkerboard. Transparent sky above architectural silhouette. River fills foreground full bleed to bottom and both edges. Soft neutral daytime illumination, muted cool slate blue and desaturated teal, small warm amber window hints so app can cast its own colored light. No sun, moon, clouds, stars, text, logos, borders, frame, UI or people. Not cartoon or isometric. Actual PNG with transparency.
+
+## 精選城市補充插畫
+
+30 座精選城市中，除原有的 London、Taipei、New York 外，另有 27 張獨立透明 PNG，位於 `WorldTime/Assets.xcassets/City-<城市 id>.imageset/`。各圖以內建 imagegen 分別產生，並以 London 原圖為風格參考；城市地標會藝術化拼合，並非街景實拍。圖檔使用城市 id 命名，可直接對照 `CityCatalog`。
+
+共通提示詞：Use case: stylized-concept. Create a transparent portrait landscape layer for a world-clock app depicting the named city with its recognizable local architecture and natural setting. Use the original London image as a style reference: refined painterly detail, muted slate blue, subtle warm lights, watercolor and paper texture, and a lower-half city composition. Leave the upper half transparent for the app's dynamic sky. No sun, moon, people, text, labels, borders, or UI. Make a separate image for each city.
+
+城市：Tokyo、Seoul、Hong Kong、Singapore、Bangkok、Shanghai、Dubai、New Delhi、Paris、Berlin、Rome、Istanbul、Los Angeles、Chicago、Vancouver、Toronto、São Paulo、Sydney、Auckland、Honolulu、Cairo、Cape Town、Jakarta、Madrid、Amsterdam、Moscow、Mexico City。各圖提示中另有對應城市地標，例如 Tokyo Tower、Eiffel Tower、Sydney Opera House、Burj Khalifa 和 Mexico City 的 Palacio de Bellas Artes。

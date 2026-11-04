@@ -268,6 +268,66 @@ enum CityCatalog {
         .flatMap { $0 }
     static let defaults = Array(all.prefix(3))
 
+    /// 新增清單以同一國家、同一現行民用時區的第一座城市為代表。
+    /// IANA 有些地區識別碼不同但現行規則相同；只合併已知的組合，
+    /// 不以目前的 UTC 時差推斷，避免把夏令時間規則不同的地區合併。
+    private struct RepresentativeKey: Hashable {
+        let country: String
+        let zone: String
+    }
+
+    private static func representativeKey(for city: City) -> RepresentativeKey {
+        let equivalentZones: [String: String] = [
+            "America/Detroit": "America/New_York",
+            "Australia/Melbourne": "Australia/Sydney",
+            "Australia/Hobart": "Australia/Sydney",
+            "Asia/Samarkand": "Asia/Tashkent"
+        ]
+        return RepresentativeKey(country: city.country,
+                                 zone: equivalentZones[city.timeZoneIdentifier] ?? city.timeZoneIdentifier)
+    }
+
+    private static let representativeIndex: (cities: [City], idByCityID: [String: String]) = {
+        var representatives: [City] = []
+        var idByKey: [RepresentativeKey: String] = [:]
+        var idByCityID: [String: String] = [:]
+        for city in all {
+            let key = representativeKey(for: city)
+            if idByKey[key] == nil {
+                idByKey[key] = city.id
+                representatives.append(city)
+            }
+            idByCityID[city.id] = idByKey[key]
+        }
+        return (representatives, idByCityID)
+    }()
+
+    /// 精選供新增的代表城市；完整資料仍用來還原舊收藏和對應搜尋別名。
+    private static let featuredCityIDs: Set<String> = [
+        "london", "taipei", "new-york", "tokyo", "seoul", "hong-kong",
+        "singapore", "bangkok", "shanghai", "dubai", "delhi", "paris",
+        "berlin", "rome", "istanbul", "los-angeles", "chicago", "toronto",
+        "sao-paulo", "sydney", "cairo", "cape-town", "vancouver", "honolulu",
+        "auckland", "madrid", "amsterdam", "moscow", "mexico-city", "jakarta"
+    ]
+
+    static let representativeCities: [City] = representativeIndex.cities.filter {
+        featuredCityIDs.contains($0.id)
+    }
+
+    /// 仍保留原城市供既有收藏讀取；只有新增選單採用代表城市。
+    static func representativeID(forCityID id: String) -> String? {
+        representativeIndex.idByCityID[id]
+    }
+
+    /// 搜尋舊城市名稱時，若同時區代表城市在精選清單中，也會顯示該代表。
+    static func searchRepresentatives(_ query: String) -> [City] {
+        let matchingIDs = Set(all.filter { $0.matches(query) }.compactMap {
+            representativeID(forCityID: $0.id)
+        })
+        return representativeCities.filter { matchingIDs.contains($0.id) }
+    }
+
     static func city(id: String) -> City? {
         all.first { $0.id == id }
     }

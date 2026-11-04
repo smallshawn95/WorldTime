@@ -20,7 +20,7 @@ struct CityScene: View {
                     .position(x: geometry.size.width * theme.orbPosition.x,
                               y: geometry.size.height * theme.orbPosition.y)
 
-                if let artwork = city.artwork {
+                if let artwork = city.artwork ?? Self.generatedArtworkName(for: city.id) {
                     Image(artwork)
                         .resizable()
                         .scaledToFill()
@@ -47,6 +47,21 @@ struct CityScene: View {
         }
         .accessibilityHidden(true)
     }
+
+    // BEGIN GENERATED CITY ARTWORK INDEX
+    private static let illustratedCityIDs: Set<String> = [
+        "tokyo", "seoul", "hong-kong", "singapore", "bangkok",
+        "shanghai", "dubai", "delhi", "paris", "berlin",
+        "rome", "istanbul", "los-angeles", "chicago", "vancouver",
+        "toronto", "sao-paulo", "sydney", "auckland", "honolulu",
+        "cairo", "cape-town", "jakarta", "madrid", "amsterdam",
+        "moscow", "mexico-city",
+    ]
+
+    private static func generatedArtworkName(for cityID: String) -> String? {
+        illustratedCityIDs.contains(cityID) ? "City-\(cityID)" : nil
+    }
+    // END GENERATED CITY ARTWORK INDEX
 
     private var orb: some View {
         ZStack {

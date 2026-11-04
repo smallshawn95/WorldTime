@@ -6,7 +6,7 @@ struct AddCityView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
 
-    private var results: [City] { CityCatalog.all.filter { $0.matches(query) } }
+    private var results: [City] { CityCatalog.searchRepresentatives(query) }
 
     var body: some View {
         NavigationStack {
@@ -19,7 +19,13 @@ struct AddCityView: View {
                         if !cities.isEmpty {
                             Section {
                                 ForEach(cities) { city in
-                                    let isSaved = store.state.cityIDs.contains(city.id)
+                                    let savedCity = store.cities.first { $0.id == city.id }
+                                        ?? store.cities.first {
+                                            CityCatalog.representativeID(forCityID: $0.id) == city.id
+                                        }
+                                    let savedStatus: String? = savedCity.map { saved in
+                                        saved.id == city.id ? "已收藏" : "同時區已收藏：\(saved.name)"
+                                    }
                                     Button {
                                         store.add(city)
                                         dismiss()
@@ -29,16 +35,21 @@ struct AddCityView: View {
                                                 Text(city.name).font(.headline).foregroundStyle(.primary)
                                                 Text("\(city.englishName) · \(city.country)")
                                                     .font(.caption).foregroundStyle(.secondary)
+                                                if let savedStatus {
+                                                    Text(savedStatus)
+                                                        .font(.caption)
+                                                        .foregroundStyle(.secondary)
+                                                }
                                             }
                                             Spacer()
-                                            Image(systemName: isSaved ? "checkmark.circle.fill" : "plus.circle")
+                                            Image(systemName: savedCity != nil ? "checkmark.circle.fill" : "plus.circle")
                                                 .font(.title3)
-                                                .foregroundStyle(isSaved ? Color.secondary : Color(hex: 0xE5BC8B))
+                                                .foregroundStyle(savedCity != nil ? Color.secondary : Color(hex: 0xE5BC8B))
                                         }
                                         .padding(.vertical, 5)
                                     }
-                                    .disabled(isSaved)
-                                    .accessibilityLabel("\(city.name)，\(city.country)，\(isSaved ? "已收藏" : "加入收藏")")
+                                    .disabled(savedCity != nil)
+                                    .accessibilityLabel("\(city.name)，\(city.country)，\(savedStatus ?? "加入收藏")")
                                     .accessibilityIdentifier("add-\(city.id)")
                                 }
                             } header: {
@@ -47,7 +58,7 @@ struct AddCityView: View {
                         }
                     }
                     Section {
-                        Text("倫敦、臺北與紐約配有專屬景色，其他城市使用光影城市剪影。")
+                        Text("新增清單收錄精選代表城市；搜尋其他城市時，若同時區的代表已收錄，也會顯示該代表。")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }

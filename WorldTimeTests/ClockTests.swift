@@ -23,6 +23,42 @@ final class ClockTests: XCTestCase {
         XCTAssertEqual(CityCatalog.defaults.map(\.id), ["london", "taipei", "new-york"])
     }
 
+    func testRepresentativeCitiesGroupSameCountryAndZone() {
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "taichung"), "taipei")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "detroit"), "new-york")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "melbourne"), "sydney")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "samarkand"), "tashkent")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "phoenix"), "phoenix")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "denver"), "denver")
+        XCTAssertEqual(CityCatalog.representativeID(forCityID: "toronto"), "toronto")
+        XCTAssertEqual(Set(CityCatalog.representativeCities.map(\.id)).count,
+                       CityCatalog.representativeCities.count)
+        XCTAssertTrue(CityCatalog.all.allSatisfy { CityCatalog.representativeID(forCityID: $0.id) != nil })
+    }
+
+    func testSearchingLegacyCityFindsItsRepresentative() {
+        XCTAssertEqual(CityCatalog.searchRepresentatives("台中").map(\.id), ["taipei"])
+        XCTAssertEqual(CityCatalog.searchRepresentatives("Detroit").map(\.id), ["new-york"])
+        XCTAssertEqual(CityCatalog.searchRepresentatives("Melbourne").map(\.id), ["sydney"])
+        XCTAssertTrue(CityCatalog.searchRepresentatives("Phoenix").isEmpty)
+        XCTAssertTrue(CityCatalog.searchRepresentatives("Dublin").isEmpty)
+        XCTAssertEqual(CityCatalog.searchRepresentatives("Moscow").map(\.id), ["moscow"])
+        XCTAssertEqual(Set(CityCatalog.searchRepresentatives("美國").map(\.id)),
+                       Set(["new-york", "los-angeles", "chicago", "honolulu"]))
+    }
+
+    func testOnlyFeaturedCitiesAppearInAddList() {
+        let expected: Set<String> = [
+            "london", "taipei", "new-york", "tokyo", "seoul", "hong-kong",
+            "singapore", "bangkok", "shanghai", "dubai", "delhi", "paris",
+            "berlin", "rome", "istanbul", "los-angeles", "chicago", "toronto",
+            "sao-paulo", "sydney", "cairo", "cape-town", "vancouver", "honolulu",
+            "auckland", "madrid", "amsterdam", "moscow", "mexico-city", "jakarta"
+        ]
+        XCTAssertEqual(Set(CityCatalog.searchRepresentatives("").map(\.id)), expected)
+        XCTAssertNotNil(CityCatalog.city(id: "dublin"), "Existing favorites remain available")
+    }
+
     func testOneInstantShowsDifferentLocalTimes() {
         let date = instant("2026-11-03T10:30:00Z")
         XCTAssertEqual(ClockFormatting.time(date, in: london), "10:30")
